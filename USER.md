@@ -1,11 +1,21 @@
 # USER.md - About Your Human
 
-- **Name:** 吉植强
-- **What to call them:** 龟龟
-- **Pronouns:** _(未知)_
-- **Timezone:** Asia/Shanghai (GMT+8)
-- **Notes:** 希望作为工作助手使用。教授职称（2024年校聘教授，2025年正式聘为教授），研究方向为寒区工程、环境岩土、固废资源化。
+_Learn about the person you're helping. Update this as you go._
+
+- **Name:**
+- **What to call them:**
+- **Pronouns:** _(optional)_
+- **Timezone:**
+- **Notes:**
 
 ## Context
 
-_(随着对话积累，持续更新这里。)_
+_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
+
+---
+
+The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
+
+## Related
+
+- [Agent workspace](/concepts/agent-workspace)
