@@ -1,56 +1,60 @@
 # 记忆同步 - Git 方案
 
-## 两台电脑共用同一个仓库
+> 仓库地址：https://github.com/zhiqiangji/qclaw-memory
+> 分支：main
 
-### 本机（Windows）→ 初始化
-```bash
-cd C:\Users\32891\.qclaw\workspace
-git init
-git add AGENTS.md HEARTBEAT.md IDENTITY.md MEMORY.md SOUL.md USER.md TOOLS.md memory/
-git commit -m "Initial commit: memory scaffold"
-git remote add origin https://github.com/YOUR_USERNAME/qclaw-memory.git
-git push -u origin master
-```
+## 已完成的设置
 
-### Mac → 克隆并使用
+- **Windows**：HTTPS 方式（git clone/pull/push）
+- **Mac**：SSH 方式（git clone/pull/push），公钥已加入 GitHub
+
+## 每日同步流程
+
+在任意一端操作即可（Mac 或 Windows）：
+
 ```bash
-git clone https://github.com/YOUR_USERNAME/qclaw-memory.git ~/.qclaw/workspace
-cd ~/.qclaw/workspace
-# 之后每天：
-git pull   # 拉取更新
-# QClaw 产生的记忆自动写入本地文件
+cd ~/.qclaw/workspace        # Mac
+# 或 Windows:
+# cd C:\Users\32891\.qclaw\workspace
+
+git pull origin main
 git add memory/ MEMORY.md USER.md
-git commit -m "$(date '+%Y-%m-%d')"
-git push   # 推送回 GitHub
+git commit -m "sync YYYY-MM-DD"
+git push origin main
 ```
 
-Windows 每次开机后：
-```bash
-cd C:\Users\32891\.qclaw\workspace
-git pull
-# 用完 QClaw 后
-git add memory/ MEMORY.md USER.md
-git commit -m "$(date '+%Y-%m-%d')"
-git push
-```
+**建议**：每次用完 QClaw 后顺手推一下，避免两台设备内容越拉越远。
 
-### 同步哪些文件
-**必须同步（记忆核心）：**
+## 同步的文件
+
+**核心（每次必推）：**
+- `memory/*.md` — 日记
 - `MEMORY.md` — 长期记忆
 - `USER.md` — 用户档案
-- `memory/*.md` — 日记
 
-**可选同步：**
-- `AGENTS.md` / `IDENTITY.md` / `SOUL.md` / `TOOLS.md` / `HEARTBEAT.md` — 行为配置，Mac 上可单独维护
+**可选（按需推）：**
+- `AGENTS.md` / `SOUL.md` / `IDENTITY.md` / `TOOLS.md` / `HEARTBEAT.md`
 
-**不要同步：**
-- `openclaw.json` — 含机器特定配置（端口/Token/模型路径/workspace路径）
+**不要推：**
+- `openclaw.json` — 含机器特定配置（端口/Token/模型/workspace 路径）
 - `sessions/` — 对话历史，机器本地
 - `skills/` — 技能目录，按需单独同步
-- `lossless/lcm.db` — 压缩数据库，在线重建
+- `lossless/lcm.db` — 压缩数据库，可在线重建
 
-### ⚠️ 注意事项
-1. 两台电脑**不要同时开 QClaw**，可能导致 `MEMORY.md` 冲突
-2. 每次使用后**及时 push/pull**，避免积累大量冲突
-3. 如果冲突，用文本编辑器手动合并（保留两台的内容）
-4. 首次 Mac 同步时，记得把补写的 21 个日记文件先放进去再 push
+## ⚠️ 注意事项
+
+1. **不要同时开两台电脑的 QClaw** ——可能导致 MEMORY.md 冲突
+2. **冲突处理**：如遇冲突，保留两台的内容，手动合并后再 push
+3. **首次新设备**：clone 后直接用，无需再 init
+
+## Windows PowerShell 注意事项
+
+PowerShell 不支持 `&&` 串联命令，用分号分隔：
+```bash
+cd C:\Users\32891\.qclaw\workspace; git pull origin main
+```
+
+如报错"标记 '&&' 不是有效语句分隔符"，改用：
+```bash
+cd C:\Users\32891\.qclaw\workspace; git pull; git add memory/ MEMORY.md USER.md; git commit -m "sync"; git push
+```
