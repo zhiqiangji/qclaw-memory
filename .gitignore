@@ -1,100 +1,27 @@
-# OS
+# ===== OS / 临时 =====
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# Logs / temp
 *.log
 *.tmp
 *.bak
 *.tmp.*
+*.json.tmp
+*.csv.tmp
+*.json.bak
 
-# Python
+# ===== Python 运行时 =====
 __pycache__/
 *.pyc
 *.egg-info/
 
-# Node
+# ===== Node 运行时（可重新生成） =====
 node_modules/
 package-lock.json
 
-# QClaw runtime
+# ===== QClaw 运行时（非工作成果） =====
 .openclaw/
 sessions/
 thesis_unpacked/
 unpacked_doc/
-batch_*.py
-read_doc*.py
-read_dam_doc.py
-read_excel.py
-process_scores.py
-diagnose.py
-check_output.py
-write_template.py
-final_score.py
-replace_grading.py
-verify_xlsx.py
-extract_doc.py
-modify_docx.py
-create_docx.js
-create_tumu_docx.py
-create_survey.js
-create_survey_args.json
-create_survey_direct.js
-export_survey.py
-export_survey_v2.py
-list_answers.js
-run_create_survey.js
-search1.py
-search_apam.py
-search_apam2.py
-search_apam3.py
-survey_payload.json
-survey_text.txt
-
-# One-off project files (non-recurring, Chinese-named one-offs)
-2026_4_*.txt
-工*.txt
-学*.txt
-生*.txt
-土*.txt
-*.json.tmp
-*.csv.tmp
-广联达交流发言稿*.md
-工程问题*.docx
-工程问题*.doc
-技术资料*.doc
-技术资料*.pdf
-问题*.xlsx
-问题*.xls
-问题*.docx
-问题*.doc
-参考文献.txt
-学生名单.txt
-会议议程*.docx
-会议议程*.pdf
-议程*.docx
-三方协议*.pdf
-联合申报合作协议书.pdf
-烟台大学*.docx
-*.docx.flag.*
-生成结果.txt
-工*.md
-*.json.bak
-专业认证*.docx
-专业认证*.doc
-土木工程*.docx
-土木工程*.doc
-
-# .qclaw internal (not memory-relevant)
-*.pdf
-*.mp4
-*.jpg
-*.png
-*.xlsx
-*.xls
-*.pptx
-*.ppt
-
-# Memory sync helper
 .consolidate-state.json

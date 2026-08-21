@@ -1,0 +1,108 @@
+================================================================================
+Document Preview: 终稿_宋纯昭.docx
+================================================================================
+
+Title: 烟 台 大 学
+Table Count: 115
+
+Content Preview:
+烟 台 大 学
+毕 业 设 计
+CQ高速公路TDG-1隧道设计（左幅）
+申请学位：    工学学士
+学    院：    土木工程学院
+专    业：    土木工程
+姓    名：      宋纯昭
+学    号：    202259501207
+指导老师：    侯哲生（副教授）
+2026年5月15日
+烟台大学
+CQ高速公路TDG-1隧道设计（左幅）
+姓  名：    宋纯昭
+导  师：     侯哲生
+2026年5月16日
+烟台大学
+烟台大学学位论文原创性声明和使用授权说明
+原创性声明
+本人郑重声明：所呈交的学位论文，是本人在指导教师的指导下，进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不含任何其他个人或集体已经发表或撰写过的作品或成果。对本文的研究做出重要贡献的个人和集体，均已在文中以明确方式标明。本声明的法律结果由本人承担。
+论文作者签名：          日期：     年    月    日
+学位论文使用授权说明
+本人完全了解烟台大学关于收集、保存、使用学位论文的规定，即：按照学校要求提交学位论文的印刷本和电子版本；学校有权保存学位论文的印刷本和电子版；学校可以采用影印、缩印、扫描等复制手段保存、汇编论文。（保密论文在解密后遵守此规定）
+论文作者签名：            导师签名：
+日期：     年    月    日
+摘   要
+CQ高速公路TDG-1隧道设计（左幅）为背景为某高速公路关键控制性工程，隧道全长1080 m，设计行车速度 120 km/h，采用单洞三车道断面形式。隧址区地质条件复杂，穿越 Ⅲ～Ⅴ 级围岩，存在超浅埋、浅埋、深埋三种结构受力状态。设计严格遵循现行公路隧道规范，采用复合式衬砌结构形式，由初期支护与二次衬砌共同承担围岩荷载；运用 MIDAS GTS NX 有限元软件建立数值模型，完成二次衬砌内力分析与安全验算，确保结构长期稳定可靠；同时结合工程水文条件，开展完善的隧道防排水系统设计，保障隧道运营安全与耐久性。本设计综合考虑地质条件、结构安全与施工可行性，形成一套完整、经济、适用的隧道结构设计方案。
+关键词：隧道；结构设计；二次衬砌
+ABSTRACT
+The CQ Expressway TDG-1 Tunnel Design (Left Lane), serving as a critical control project on the expressway, spans 1,080 meters with a design speed of 120 km/h and features a single-bore three-lane cross-section. The tunnel site exhibits complex geological conditions, traversing Grade III to V surrounding rock formations and presenting three structural stress states: ultra-shallow burial, shallow burial, and deep burial. The design strictly adheres to current highway tunnel codes, employing a composite lining system where primary support and secondary lining jointly bear the surrounding rock loads. A numerical model was developed using MIDAS GTS NX finite element software to conduct internal force analysis and safety verification of the secondary lining, ensuring long-term structural stability and reliability. Additionally, a comprehensive tunnel drainage and waterproofing system was designed considering hydrological conditions to guarantee operational safety and durability. This design integrates geological considerations, structural safety, and construction feasibility, resulting in a complete, cost-effective, and practical tunnel structure solution.
+Key words； Tunnel； Design； Secondary lining
+目  录
+1  建筑设计说明	1
+1.1 设计原则	1
+1.2 设计依据及执行规范	1
+1.3 技术标准	2
+1.4 隧道概况	2
+1.5 工程地质概况	3
+1.6 建筑限界及内轮廓设计	3
+1.6.1 建筑限界设计	3
+1.6.2 内轮廓设计	4
+1.7 洞门及洞口设计	5
+1.7.1 洞门及洞口设计原则	5
+1.7.2 隧道洞门的形式	5
+1.7.3 隧道洞门的设计参数	6
+1.8 衬砌设计	6
+1.8.1 明洞衬砌设计	6
+1.8.2 主洞复合式衬砌	6
+1.8.3 衬砌结构具体设计参数	8
+1.9 辅助施工设计	10
+1.9.1 超前小导管	10
+1.9.2 超前长管棚	11
+1.9.3 超前锚杆	11
+1.10 防排水设计	11
+1.10.1 防水	11
+1.10.2 排水	12
+1.11 通风与照明设计	12
+1.12 监控量测与超前地质预报设计	13
+2  洞门计算	15
+2.1 结构设计概况	15
+2.2 墙背土压力计算	15
+2.3 墙身自重计算	17
+2.4 洞门墙墙底验算	18
+2.4.1 端墙墙底偏心距验算	18
+2.4.2 墙底承载力验算	20
+2.5 端墙洞门整体稳定性验算	21
+2.5 墙身截面验算	23
+2.5.1 计算截面以上挡土墙自重的计算	23
+2.5.2 计算1，2截面挡土墙的土压力	25
+2.5.3 偏心距验算	26
+2.6.1 抗压承载力验算	28
+2.6.2 抗剪承载力验算	29
+2.6.3 稳定性验算	30
+3  衬砌结构计算	32
+3.1 隧道深浅埋判别	32
+3.1.1 判别依据	32
+3.1.2 Ⅲ级围岩隧道深浅埋判别	32
+3.1.3 Ⅳ级围岩隧道深浅埋判别	33
+3.1.2 Ⅴ级围岩隧道深浅埋判别	33
+3.2 围岩压力计算	36
+3.2.1 围岩压力计算方法	36
+3.2.2 各级别围岩压力计算	37
+3.3 衬砌结构内力计算	39
+3.3.1 计算原理及MIDAS简介	39
+3.3.2 Ⅲ级围岩内力计算	40
+3.3.3 Ⅳ级围岩内力计算	42
+3.3.4 Ⅴ级围岩内力计算	44
+3.4 衬砌结构强度验算	47
+3.4.1 衬砌验算依据	47
+3.4.2 Ⅲ级围岩验算	49
+3.4.3 Ⅳ级围岩验算	51
+3.4.4 Ⅴ级围岩验算	52
+4  通风计算	57
+4.1 计算设计计算条件	57
+4.2 通风方式选择	58
+4.3 隧道需风量计算	59
+4.3.1 稀释烟尘的需风量	59
+4.3.2 稀释CO的需风量	63
+4.3.3 隧道换气需风量	67
+4.3.4 隧道需风量最终取值及风速校核	67
+4.4 单向射流风机纵向通风计算	68
