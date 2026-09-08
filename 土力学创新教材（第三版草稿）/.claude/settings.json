@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -l *.json)",
+      "Bash(ls -t notification_*.json)",
+      "Bash(ls -lt *notification_*.txt)",
+      "Bash(ls -la *notification**.txt)",
+      "Bash(rm -f notification_9131753115002882447_*.*)",
+      "Bash(python -c ':*)"
+    ]
+  }
+}

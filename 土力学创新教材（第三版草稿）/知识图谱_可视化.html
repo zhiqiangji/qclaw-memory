@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>土力学创新教材 - 可视化知识图谱</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#container {
+    width: 100vw;
+    height: 100vh;
+}
+
+#header {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    max-width: 340px;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+#header h1 {
+    font-size: 18px;
+    color: #2d3748;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+#header p {
+    font-size: 12px;
+    color: #718096;
+    line-height: 1.5;
+}
+
+#controls {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    padding: 7px 13px;
+    font-size: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.control-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+#legend {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #4a5568;
+    padding: 3px 6px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 4px;
+}
+
+.legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+.link {
+    stroke: #a0aec0;
+    stroke-opacity: 0.5;
+    stroke-width: 2;
+}
+
+.link-cross {
+    stroke: #ed8936;
+    stroke-opacity: 0.4;
+    stroke-width: 1.5;
+    stroke-dasharray: 5,5;
+}
+
+.node circle {
+    stroke: #ffffff;
+    stroke-width: 2.5;
+    cursor: pointer;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+    transition: all 0.2s;
+}
+
+.node text {
+    font-size: 12px;
+    font-weight: 500;
+    text-anchor: middle;
+    pointer-events: none;
+    fill: #2d3748;
+}
+
+.node--root text {
+    font-weight: bold;
+    font-size: 15px;
+    fill: white;
+}
+
+.node--chapter text {
+    font-weight: 600;
+    fill: #2d3748;
+}
+
+.node:hover circle {
+    stroke-width: 3.5;
+    stroke: #4a5568;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
+    transform: scale(1.1);
+}
+
+.node--focus circle {
+    stroke: #ed8936;
+    stroke-width: 4;
+}
+
+#tooltip {
+    position: absolute;
+    background: rgba(45, 55, 72, 0.95);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 100;
+    max-width: 280px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+#tooltip h4 {
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #90cdf4;
+    font-weight: 600;
+}
+
+#tooltip p {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #e2e8f0;
+}
+
+#footer-note {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    color: #718096;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+<body>
+<div id="container">
+    <div id="header">
+        <h1>🌐 土力学创新教材 知识图谱</h1>
+        <p>《土力学》（第三版）· 三个"融"：<br>AI融合 + 力学知识链贯通 + 课程思政自然融入</p>
+        <div id="controls">
+            <button class="control-btn" onclick="resetZoom()">🏠 重置</button>
+            <button class="control-btn" onclick="toggleAnimation()">⏯️ 动画</button>
+            <button class="control-btn" onclick="toggleCrossLinks()">🔗 跨章关联</button>
+        </div>
+        <div id="legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background: #2c3e50"></span>
+                <span>根</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #4299e1"></span>
+                <span>章节</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #38b2ac"></span>
+                <span>核心</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #9f7aea"></span>
+                <span>AI</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #f56565"></span>
+                <span>思政</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #ed8936"></span>
+                <span>跨章</span>
+            </div>
+        </div>
+    </div>
+    <div id="tooltip"></div>
+    <div id="footer-note">💡 拖动节点 · 滚轮缩放 · 悬停查看描述</div>
+    <svg width="100%" height="100%"></svg>
+</div>
+
+<script>
+// 知识图谱数据
+const data = {
+    name: "土力学\n创新教材",
+    group: "root",
+    description: "土力学创新教材（第三版）完整知识体系，践行三个融合：AI与土力学融合、力学知识链贯通、课程思政自然融入",
+    children: [
+        {
+            name: "第1章\n绪论",
+            group: "chapter",
+            description: "土力学学科概述，建立知识体系整体认知",
+            children: [
+                {name: "研究对象", group: "core", description: "土力学研究对象与学科任务"},
+                {name: "发展历程", group: "core", description: "从太沙基到现代土力学，中国学者贡献"},
+                {name: "学科定位", group: "core", description: "在力学与土木工程中的定位"},
+                {name: "学习方法", group: "core", description: "土力学课程学习指导"},
+                {name: "力学贯通", group: "guantong", description: "从理论力学到土力学知识链"},
+                {name: "大国工程", group: "sizheng", description: "中国土木工程发展的思政教育"}
+            ]
+        },
+        {
+            name: "第2章\n物理性质\n&分类",
+            group: "chapter",
+            description: "土的组成、物理性质指标与工程分类",
+            children: [
+                {name: "土的形成", group: "core", description: "风化作用与成因类型"},
+                {name: "粒度成分", group: "core", description: "颗粒分析与级配曲线"},
+                {name: "物理性质指标", group: "core", description: "三相指标换算"},
+                {name: "物理状态", group: "core", description: "密实度、稠度、灵敏度"},
+                {name: "结构与构造", group: "core", description: "土的微观结构与宏观构造"},
+                {name: "工程分类", group: "core", description: "国家标准分类体系"},
+                {name: "特殊土", group: "core", description: "软土、黄土、膨胀土、红黏土"},
+                {name: "Python绘图", group: "ai", description: "AI融合：Python绘制颗粒级配曲线"}
+            ]
+        },
+        {
+            name: "第3章\n土中应力",
+            group: "chapter",
+            description: "自重应力、附加应力与有效应力原理",
+            children: [
+                {name: "自重应力", group: "core", description: "成层土与地下水位影响"},
+                {name: "基底附加压力", group: "core", description: "基底压力分布与简化计算"},
+                {name: "地基附加应力", group: "core", description: "布辛尼斯克解与角点法"},
+                {name: "有效应力原理", group: "core", description: "太沙基有效应力原理"},
+                {name: "应力路径", group: "core", description: "应力路径概念与表达"},
+                {name: "非饱和土有效应力", group: "extend", description: "基质吸力与土水特征曲线"},
+                {name: "PINN应力求解", group: "ai", description: "物理信息神经网络求解应力场"}
+            ]
+        },
+        {
+            name: "第4章\n渗透性\n&渗流",
+            group: "chapter",
+            description: "达西定律、渗流理论与渗透变形",
+            children: [
+                {name: "达西定律", group: "core", description: "渗流基本定律与渗透系数"},
+                {name: "流网理论", group: "core", description: "流网性质与工程应用"},
+                {name: "渗流力", group: "core", description: "渗透力与临界水力坡降"},
+                {name: "渗透变形", group: "core", description: "流土与管涌，防治措施"},
+                {name: "非饱和渗流", group: "extend", description: "Richards方程"},
+                {name: "渗流数值分析", group: "extend", description: "有限元渗流分析"},
+                {name: "PINN渗流求解", group: "ai", description: "物理信息神经网络求解渗流场"},
+                {name: "三峡渗流控制", group: "sizheng", description: "三峡大坝渗流控制工程案例"}
+            ]
+        },
+        {
+            name: "第5章\n压缩性\n&地基沉降",
+            group: "chapter",
+            description: "压缩性、固结理论与沉降计算",
+            children: [
+                {name: "土的压缩性", group: "core", description: "固结试验与压缩性指标"},
+                {name: "应力历史", group: "core", description: "先期固结压力与超固结比"},
+                {name: "沉降计算", group: "core", description: "分层总和法与规范法"},
+                {name: "一维固结理论", group: "core", description: "太沙基固结理论与固结度"},
+                {name: "多维固结", group: "extend", description: "Biot固结理论简介"},
+                {name: "次固结沉降", group: "extend", description: "次固结机理与长期沉降"},
+                {name: "沉降控制", group: "engineer", description: "沉降控制工程措施"},
+                {name: "力学贯通", group: "guantong", description: "从弹性力学到固结理论"}
+            ]
+        },
+        {
+            name: "第6章\n土的\n抗剪强度",
+            group: "chapter",
+            description: "莫尔-库仑理论与剪切试验方法",
+            children: [
+                {name: "莫尔-库仑理论", group: "core", description: "库仑定律与极限平衡条件"},
+                {name: "直剪试验", group: "core", description: "直剪试验方法与成果整理"},
+                {name: "三轴压缩试验", group: "core", description: "UU/CU/CD三种试验方法"},
+                {name: "孔隙水压力系数", group: "core", description: "Skempton孔隙水压力系数"},
+                {name: "饱和黏性土强度", group: "core", description: "不排水强度与有效应力强度"},
+                {name: "无黏性土强度", group: "core", description: "密实度对强度的影响"},
+                {name: "临界状态土力学", group: "extend", description: "临界状态线与状态边界面"},
+                {name: "力学贯通", group: "guantong", description: "从塑性力学到土的强度理论"},
+                {name: "AI强度预测", group: "ai", description: "机器学习预测抗剪强度参数"}
+            ]
+        },
+        {
+            name: "第7章\n土压力\n理论",
+            group: "chapter",
+            description: "朗肯、库仑理论与挡土墙设计",
+            children: [
+                {name: "土压力类型", group: "core", description: "静止、主动、被动土压力"},
+                {name: "朗肯理论", group: "core", description: "半无限土体假定与应力分析"},
+                {name: "库仑理论", group: "core", description: "滑动楔体假定"},
+                {name: "复杂条件计算", group: "core", description: "成层填土、地下水、局部荷载"},
+                {name: "地震土压力", group: "extend", description: "Mononobe-Okabe理论"},
+                {name: "挡土墙设计", group: "engineer", description: "稳定性验算与工程措施"},
+                {name: "PINN土压力", group: "ai", description: "物理信息神经网络求解土压力分布"},
+                {name: "挡土墙工程", group: "sizheng", description: "大型挡土墙工程建设思政案例"}
+            ]
+        },
+        {
+            name: "第8章\n地基\n承载力",
+            group: "chapter",
+            description: "极限承载力理论与工程确定方法",
+            children: [
+                {name: "破坏模式", group: "core", description: "三种地基破坏模式"},
+                {name: "临塑荷载", group: "core", description: "临塑荷载与临界荷载"},
+                {name: "极限承载力", group: "core", description: "太沙基、梅耶霍夫、汉森公式"},
+                {name: "影响因素", group: "core", description: "土性、基础形状、地下水影响"},
+                {name: "承载力特征值", group: "engineer", description: "载荷试验与规范修正"},
+                {name: "复合地基", group: "extend", description: "复合地基承载力计算"},
+                {name: "AI承载力预测", group: "ai", description: "机器学习预测地基承载力"},
+                {name: "港珠澳大桥", group: "sizheng", description: "港珠澳大桥地基处理工程案例"}
+            ]
+        },
+        {
+            name: "第9章\n土坡\n稳定分析",
+            group: "chapter",
+            description: "条分法与边坡加固工程",
+            children: [
+                {name: "失稳原因", group: "core", description: "土坡失稳类型与主要原因"},
+                {name: "无黏性土坡", group: "core", description: "渗流作用对稳定的影响"},
+                {name: "瑞典条分法", group: "core", description: "整体圆弧滑动法"},
+                {name: "简化毕肖普法", group: "core", description: "考虑条间力的简化方法"},
+                {name: "传递系数法", group: "core", description: "折线滑动面计算"},
+                {name: "强度折减法", group: "extend", description: "有限元强度折减法"},
+                {name: "边坡加固", group: "engineer", description: "抗滑桩、锚杆、加筋加固"},
+                {name: "川藏铁路边坡", group: "sizheng", description: "川藏铁路高原边坡工程案例"}
+            ]
+        },
+        {
+            name: "第10章\n土的\n动力特性",
+            group: "chapter",
+            description: "动强度、液化与动力固结",
+            children: [
+                {name: "动应力应变", group: "core", description: "动模量与阻尼比"},
+                {name: "动强度", group: "core", description: "土的动强度特性"},
+                {name: "振动液化", group: "core", description: "液化机理与规范判别法"},
+                {name: "动力固结", group: "core", description: "强夯法动力固结理论"},
+                {name: "动力相互作用", group: "extend", description: "土-结构动力相互作用简介"},
+                {name: "AI液化判别", group: "ai", description: "机器学习预测地震液化风险"},
+                {name: "汶川地震液化", group: "sizheng", description: "地震液化工程教训与思政"}
+            ]
+        },
+        {
+            name: "第11章\n前沿\n专题",
+            group: "chapter",
+            description: "现代岩土工程前沿进展",
+            children: [
+                {name: "能源桩", group: "frontier", description: "能源桩热-力耦合特性"},
+                {name: "地下储能", group: "frontier", description: "压缩空气储能岩土工程问题"},
+                {name: "污染土修复", group: "frontier", description: "污染土工程特性与修复技术"},
+                {name: "固废资源化", group: "frontier", description: "建筑垃圾与工业固废利用"},
+                {name: "冻土工程", group: "frontier", description: "冻融循环与工程应对"},
+                {name: "微生物岩土", group: "frontier", description: "MICP微生物改性技术"},
+                {name: "纳米改性土", group: "frontier", description: "纳米材料改良土性质"},
+                {name: "数字孪生", group: "ai", description: "岩土工程数字孪生"},
+                {name: "双碳战略", group: "sizheng", description: "双碳战略与绿色岩土"}
+            ]
+        },
+        {
+            name: "第12章\n综合应用\n课程群贯通",
+            group: "chapter",
+            description: "综合应用与课程群知识衔接",
+            children: [
+                {name: "先修课程衔接", group: "core", description: "工程地质对土力学支撑"},
+                {name: "后续课程衔接", group: "core", description: "基础工程与地基处理应用"},
+                {name: "综合案例分析", group: "engineer", description: "实际工程案例决策分析"},
+                {name: "AI辅助设计", group: "ai", description: "AI辅助岩土工程设计"},
+                {name: "课程群图谱", group: "core", description: "大土木课程体系整体贯通"},
+                {name: "大国工程思政", group: "sizheng", description: "大国工程中的土力学智慧"},
+                {name: "注册考试", group: "engineer", description: "注册岩土工程师考试备考"}
+            ]
+        }
+    ]
+};
+
+// 跨章节知识关联（核心原理贯穿多章）
+const crossLinks = [
+    // 有效应力原理关联
+    {from: "有效应力原理", to: "渗流力", chapter: "第4章\n渗透性\n&渗流"},
+    {from: "有效应力原理", to: "固结理论", chapter: "第5章\n压缩性\n&地基沉降"},
+    {from: "有效应力原理", to: "抗剪强度", chapter: "第6章\n土的\n抗剪强度"},
+    // 抗剪强度关联
+    {from: "莫尔-库仑理论", to: "土压力", chapter: "第7章\n土压力\n理论"},
+    {from: "莫尔-库仑理论", to: "地基承载力", chapter: "第8章\n地基\n承载力"},
+    {from: "莫尔-库仑理论", to: "边坡稳定", chapter: "第9章\n土坡\n稳定分析"},
+    // AI关联
+    {from: "PINN应力求解", to: "PINN渗流求解", chapter: "第4章"},
+    {from: "PINN渗流求解", to: "PINN土压力", chapter: "第7章"},
+    // 思政关联
+    {from: "三峡渗流控制", to: "港珠澳大桥", chapter: "第8章"},
+    {from: "港珠澳大桥", to: "川藏铁路边坡", chapter: "第9章"},
+    {from: "川藏铁路边坡", to: "汶川地震液化", chapter: "第10章"},
+    // 力学贯通
+    {from: "力学贯通", to: "有效应力原理", chapter: "第3章"},
+];
+
+// 颜色映射 - 清新配色
+const colorMap = {
+    root: "#2c3e50",
+    chapter: "#4299e1",
+    core: "#38b2ac",
+    extend: "#63b3ed",
+    engineer: "#48bb78",
+    ai: "#9f7aea",
+    sizheng: "#f56565",
+    guantong: "#ed8936",
+    frontier: "#38b2ac",
+};
+
+// 节点半径 - 比例协调
+const radiusMap = {
+    root: 42,
+    chapter: 30,
+    core: 18,
+    extend: 16,
+    engineer: 16,
+    ai: 16,
+    sizheng: 16,
+    guantong: 16,
+    frontier: 16,
+};
+
+// 扁平化数据
+let nodes = [];
+let links = [];
+let nodeMap = new Map();
+let nodeId = 0;
+
+function processData(parentId, dataObj) {
+    const id = nodeId++;
+    const node = {
+        id: id,
+        name: dataObj.name,
+        group: dataObj.group,
+        description: dataObj.description || "",
+        parent: parentId
+    };
+    nodes.push(node);
+    nodeMap.set(dataObj.name, id);
+    if (parentId !== null) {
+        links.push({
+            source: parentId,
+            target: id,
+            type: "hierarchy"
+        });
+    }
+    if (dataObj.children) {
+        dataObj.children.forEach(child => {
+            processData(id, child);
+        });
+    }
+    return id;
+}
+
+processData(null, data);
+
+// 添加跨章节关联
+function addCrossLinks() {
+    crossLinks.forEach(cl => {
+        // 查找最近的匹配节点
+        let sourceId = null;
+        let targetId = null;
+        for (let [name, id] of nodeMap) {
+            if (name.includes(cl.from) && sourceId === null) sourceId = id;
+            if (name.includes(cl.to) && targetId === null) targetId = id;
+        }
+        if (sourceId !== null && targetId !== null) {
+            links.push({
+                source: sourceId,
+                target: targetId,
+                type: "cross"
+            });
+        }
+    });
+}
+
+let showCrossLinks = true;
+addCrossLinks();
+
+// 设置SVG
+const svg = d3.select("svg");
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+svg.attr("width", width).attr("height", height);
+
+const g = svg.append("g");
+
+// 缩放行为
+const zoom = d3.zoom()
+    .scaleExtent([0.1, 4])
+    .on("zoom", (event) => {
+        g.attr("transform", event.transform);
+    });
+
+svg.call(zoom);
+
+// 初始化位置 - 保证节点都在可视区域
+const centerX = width / 2;
+const centerY = height / 2;
+nodes[0].x = centerX;
+nodes[0].y = centerY;
+
+// 让章节环形分布在根节点周围
+let chapterNodes = nodes.filter(n => n.group === "chapter");
+let chapterCount = chapterNodes.length;
+chapterNodes.forEach((node, i) => {
+    const angle = (2 * Math.PI * i) / chapterCount;
+    node.x = centerX + 220 * Math.cos(angle);
+    node.y = centerY + 220 * Math.sin(angle);
+});
+
+// 力模拟 - 调整参数让布局更舒展
+let simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).distance(d => {
+        if (d.type === "cross") return 180;
+        const sourceGroup = d.source.group;
+        if (sourceGroup === "root") return 220;
+        if (sourceGroup === "chapter") return 70;
+        return 50;
+    }).strength(d => d.type === "cross" ? 0.3 : 0.8))
+    .force("charge", d3.forceManyBody().strength(-500))
+    .force("center", d3.forceCenter(centerX, centerY))
+    .force("collide", d3.forceCollide().radius(d => radiusMap[d.group] + 10))
+    .force("x", d3.forceX(centerX).strength(0.08))
+    .force("y", d3.forceY(centerY).strength(0.08));
+
+// 绘制连线
+const linkGroup = g.append("g");
+
+function updateLinks() {
+    linkGroup.selectAll("*").remove();
+
+    // 层级连线
+    const hierarchyLinks = linkGroup.selectAll(".link")
+        .data(links.filter(d => d.type === "hierarchy"))
+        .enter().append("line")
+        .attr("class", "link");
+
+    // 跨章节连线
+    if (showCrossLinks) {
+        const crossLinkList = linkGroup.selectAll(".link-cross")
+            .data(links.filter(d => d.type === "cross"))
+            .enter().append("line")
+            .attr("class", "link-cross");
+    }
+}
+
+updateLinks();
+
+// 绘制节点
+const node = g.append("g")
+    .selectAll("g")
+    .data(nodes)
+    .enter().append("g")
+    .attr("class", "node")
+    .classed("node--root", d => d.group === "root")
+    .classed("node--chapter", d => d.group === "chapter")
+    .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+node.append("circle")
+    .attr("r", d => radiusMap[d.group])
+    .style("fill", d => colorMap[d.group]);
+
+// 文本位置调整
+node.append("text")
+    .attr("dy", d => {
+        if (d.group === "root") return 4;
+        return radiusMap[d.group] + 14;
+    })
+    .text(d => d.name);
+
+// 工具提示
+const tooltip = d3.select("#tooltip");
+
+node.on("mouseover", function(event, d) {
+        tooltip.style("opacity", 1);
+        tooltip.html(`
+            <h4>${d.name.replace(/\n/g, " ")}</h4>
+            <p>${d.description || ""}</p>
+        `);
+        tooltip.style("left", (event.pageX + 10) + "px")
+               .style("top", (event.pageY - 10) + "px");
+    })
+    .on("mousemove", function(event) {
+        tooltip.style("left", (event.pageX + 10) + "px")
+               .style("top", (event.pageY - 10) + "px");
+    })
+    .on("mouseout", function() {
+        tooltip.style("opacity", 0);
+    })
+    .on("click", function(event, d) {
+        if (tooltip.style("opacity") === "1" && tooltip.innerHTML.includes(d.description)) {
+            tooltip.style("opacity", 0);
+        } else {
+            tooltip.style("opacity", 1);
+            tooltip.html(`
+                <h4>${d.name.replace(/\n/g, " ")}</h4>
+                <p>${d.description || ""}</p>
+            `);
+            tooltip.style("left", (event.pageX + 10) + "px")
+                   .style("top", (event.pageY - 10) + "px");
+        }
+    });
+
+simulation.on("tick", () => {
+    linkGroup.selectAll("line")
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+}
+
+function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+}
+
+function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    // 保持固定位置，方便用户整理
+}
+
+let animating = true;
+function toggleAnimation() {
+    if (animating) {
+        simulation.stop();
+        animating = false;
+    } else {
+        simulation.alphaTarget(0.3).restart();
+        animating = true;
+    }
+}
+
+function toggleCrossLinks() {
+    showCrossLinks = !showCrossLinks;
+    updateLinks();
+    simulation.alpha(0.3).restart();
+}
+
+function resetZoom() {
+    svg.transition()
+        .duration(750)
+        .call(zoom.transform, d3.zoomIdentity);
+    // 释放所有固定节点
+    nodes.forEach(d => {
+        if (d.group !== "root") {
+            d.fx = null;
+            d.fy = null;
+        }
+    });
+    simulation.alpha(1).restart();
+}
+
+// 窗口大小调整
+window.addEventListener('resize', () => {
+    const newWidth = window.innerWidth;
+    const newHeight = window.innerHeight;
+    svg.attr("width", newWidth).attr("height", newHeight);
+    simulation.force("center", d3.forceCenter(newWidth / 2, newHeight / 2));
+    simulation.alpha(0.3).restart();
+});
+</script>
+</body>
+</html>

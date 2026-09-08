@@ -25,3 +25,4 @@ sessions/
 thesis_unpacked/
 unpacked_doc/
 .consolidate-state.json
+FETCH_HEAD
